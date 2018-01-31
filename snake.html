@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+    <canvas id="canvas" width="500" height="500"></canvas>
+</head>
+<body>
+    <script>
+        var cans = document.getElementById("canvas");
+        var ctx = cans.getContext("2d");
+        window.onload = function(){
+            document.addEventListener("keydown",keypush);
+            setInterval(game,1000/15);                      
+        }
+        var vx = 0;     //x方向移动速度
+        var vy = 0;     //y方向移动速度
+        var hx = 10;    //蛇头坐标x
+        var hy = 10;    //蛇头坐标y
+        var sw = 8;     //方块间有间隙
+        var sh = 18;
+        var ax = 70;     //苹果坐标
+        var ay = 70;
+        var tail = 5;     //蛇长
+        var trail = [];   //存储蛇方块的数组
+        var img = new Image();
+        img.src="apple.png";
+
+        function game(){
+            hx+=vx;
+            hy+=vy;
+            if(hx<0){  //判断边界，调整蛇头位置
+                hx = cans.width;
+            }
+            if(hx>cans.width){
+                hx = 0;
+            }
+            if(hy<0){
+                hy = cans.height;
+            }
+            if(hy>cans.height){
+                hy = 0;
+            }
+            ctx.fillStyle="black";
+            ctx.fillRect(0,0,cans.width,cans.height);
+
+            for(var i=1;i<25;i++){
+                    ctx.strokeStyle = 'rgba(102,204,0,0.2)';
+                    ctx.beginPath();
+                    ctx.moveTo(20*i,0);
+                    ctx.lineTo(20*i,cans.height);
+                    ctx.stroke();
+                    ctx.closePath();   
+            }  
+            for(var j=1;j<25;j++){
+                    ctx.strokeStyle = 'rgba(102,204,0,0.2)';
+                    ctx.beginPath();
+                    ctx.moveTo(0,20*j);
+                    ctx.lineTo(cans.width,20*j);
+                    ctx.stroke();
+                    ctx.closePath();   
+            }
+
+            ctx.fillStyle="lime";
+            for(var i= 0;i<trail.length;i++){   //从蛇尾开始向蛇头画
+                ctx.fillRect(trail[i].x,trail[i].y,sw,sh);
+                if(trail[i].x==hx&&trail[i].y==hy){
+                    tail = 5;
+                }
+            }
+            trail.push({x:hx,y:hy});   //将蛇头放在数组的最后一个
+            while(trail.length>tail){  //如果数组长度大于本该有的长度，则从蛇尾开始删除（栈结构）
+                trail.shift();
+            }
+            if(hx==ax&&hy==ay){
+                tail++;
+                ax = 10*Math.floor(Math.random()*45);  //保证苹果的坐标是10的倍数。以让蛇头坐标能与其重合
+                ay = 10*Math.floor(Math.random()*45);
+            }
+                ctx.drawImage(img,ax,ay,20,20);           
+
+        };
+        function keypush(e){   //根据按键情况调整位置
+            switch(e.keyCode){
+                case 39:
+                    sw=8;   //保持蛇头方向宽度为18
+                    sh=18;
+                    vx = 10;vy =0;
+                    break;
+                case 37:
+                    sw=8;
+                    sh=18;
+                    vx = -10;vy =0;
+                    break;
+                case 38:
+                    sw=18;
+                    sh=8;
+                    vx = 0;vy = -10;
+                    break;
+                case 40:
+                    sw=18;
+                    sh=8;
+                    vx = 0;vy = 10;
+                    break;
+            }
+        }
+    </script>
+</body>
